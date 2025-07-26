@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class Seller(Base):
@@ -10,6 +11,7 @@ class Seller(Base):
     zone = Column(String, nullable=False)  
     available_days = Column(String, nullable=True) 
     available_hours = Column(String, nullable=True) 
+    items = relationship("Item", back_populates="seller")
 
 
     def __repr__(self):
