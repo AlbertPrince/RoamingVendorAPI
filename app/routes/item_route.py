@@ -5,6 +5,9 @@ from app.schemas.item_schema import ItemCreate, ItemResponse
 from app.models.item import Item
 from app.models.seller import Seller
 
+from fastapi import Query
+from datetime import time as time_obj
+
 router = APIRouter()
 
 def get_db():
@@ -25,6 +28,44 @@ def create_item(item: ItemCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_item)
     return new_item
+
+@router.get("/items/search", response_model=list[ItemResponse])
+def search_items(
+    name: str = Query(None, description="Name of the item to search for"),
+    max_price: float = Query(None, description="Maximum price of the item"),
+    day: str = Query(None, description="Day of the week to check availability"),
+    time: str = Query(None, description="Time to check availability in HH:MM format"),  
+    db: Session = Depends(get_db)
+):
+    query = db.query(Item).join(Seller)
+    if name:
+        query = query.filter(Item.name.ilike(f"%{name}%"))
+    if max_price is not None:
+        query = query.filter(Item.price <= max_price)
+    if day:
+        query = query.filter(Seller.available_days.ilike(f"%{day}%"))
+    if time:
+        try:
+            input_time = time_obj.fromisoformat(time)
+            query = query.filter(
+                Seller.available_hours != None,
+            ).filter(
+                Seller.available_hours.contains("-")
+            )
+
+            results = []
+            for item in query.all():
+                start_str, end_str = item.seller.available_hours.split("-")
+                start_time = time_obj.fromisoformat(start_str.strip())
+                end_time = time_obj.fromisoformat(end_str.strip())
+                
+                if start_time <= input_time <= end_time:
+                    results.append(item)
+
+            return results
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid time format. Use HH:MM.")
+            
 
 @router.get("/items/", response_model=list[ItemResponse])
 def get_items(db: Session = Depends(get_db)):

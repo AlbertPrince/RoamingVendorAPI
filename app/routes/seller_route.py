@@ -25,14 +25,14 @@ def create_seller(seller: SellerCreate, db: Session = Depends(get_db)):
     db.refresh(db_seller)
     return db_seller
 
-@router.get("/sellers/", response_model=list[SellerResponse])
+@router.get("", response_model=list[SellerResponse])
 def get_sellers(db: Session = Depends(get_db)):
     sellers = db.query(Seller).all()
     if not sellers:
         raise HTTPException(status_code=404, detail="No sellers found")
     return sellers
 
-@router.get("/seller/{seller_id}", response_model=SellerResponse)
+@router.get("/{seller_id}", response_model=SellerResponse)
 def get_seller(seller_id: int, db: Session = Depends(get_db)):
     seller = db.query(Seller).filter(Seller.id == seller_id).first()
     if not seller:
