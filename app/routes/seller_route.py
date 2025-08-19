@@ -1,17 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from app.database import get_db
 from app.schemas.seller_schema import SellerCreate, SellerResponse
 from app.models.seller import Seller
 from app.database import SessionLocal
 
 router = APIRouter()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/sellers/", response_model=SellerResponse)
 def create_seller(seller: SellerCreate, db: Session = Depends(get_db)):

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
+from app.database import get_db
 from app.schemas.item_schema import ItemCreate, ItemResponse
 from app.models.item import Item
 from app.models.seller import Seller
@@ -9,13 +9,6 @@ from fastapi import Query
 from datetime import time as time_obj
 
 router = APIRouter()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/items/", response_model=ItemResponse)
 def create_item(item: ItemCreate, db: Session = Depends(get_db)):
