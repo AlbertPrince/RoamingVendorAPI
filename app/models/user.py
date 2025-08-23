@@ -1,7 +1,9 @@
 import enum
 from sqlalchemy import Column, Integer, String, Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.database import Base
+from app.models.buyer import Buyer
+from app.models.seller import Seller
 
 
 class UserRole(enum.Enum):
@@ -11,12 +13,12 @@ class UserRole(enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    phone_number = Column(String, unique=True, nullable=False)
-    email = Column(String, unique=True, nullable=True)
-    role = Column(Enum(UserRole), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    phone_number: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    email: Mapped[str | None] = mapped_column(String, unique=True, nullable=True)
+    role: Mapped[UserRole] = mapped_column(Enum(UserRole), nullable=False)
 
-    buyer = relationship("Buyer", back_populates="user", uselist=False)
-    seller = relationship("Seller", back_populates="user", uselist=False)
+    seller: Mapped["Seller"] = relationship(back_populates="user", uselist=False)
+    buyer: Mapped["Buyer"] = relationship(back_populates="user", uselist=False)
 

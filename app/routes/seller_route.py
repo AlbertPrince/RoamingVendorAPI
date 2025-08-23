@@ -8,48 +8,42 @@ from app.database import SessionLocal
 
 router = APIRouter()
 
-@router.post("/sellers/", response_model=SellerResponse)
-def create_seller(seller: SellerCreate, db: Session = Depends(get_db)):
-    # existing_seller = db.query(Seller).filter(Seller.phone_number == seller.phone_number).first()
-    # if existing_seller:
-    #     raise HTTPException(status_code=400, detail="Seller with this phone number already exists")
-
-    # db_seller = Seller(**seller.dict())
-    # db.add(db_seller)
-    # db.commit()
-    # db.refresh(db_seller)
-    # return db_seller
+@router.post("", response_model=SellerResponse)
+def create_seller(seller_data: SellerCreate, db: Session = Depends(get_db)):
+    # 1. Create user
     user = User(
-        name=seller.name,
-        email=seller.email,
-        phone_number=seller.phone_number,
+        name=seller_data.name,
+        email=seller_data.email,
+        phone_number=seller_data.phone_number,
         role=UserRole.seller
     )
     db.add(user)
     db.commit()
     db.refresh(user)
 
-    seller_obj = Seller(
+    # 2. Create seller profile
+    db_seller = Seller(
         user_id=user.id,
-        zone=seller.zone,
-        available_days=seller.available_days,
-        available_hours=seller.available_hours
+        zone=seller_data.zone,
+        available_days=seller_data.available_days,
+        available_hours=seller_data.available_hours
     )
-    db.add(seller_obj)
+    db.add(db_seller)
     db.commit()
-    db.refresh(seller_obj)
+    db.refresh(db_seller)
 
-    # Return combined response
+    # 3. Return response
     return SellerResponse(
-        id=seller.id,
+        id=db_seller.id,
         name=user.name,
         email=user.email,
         phone_number=user.phone_number,
-        zone=seller_obj.zone,
-        available_days=seller_obj.available_days,
-        available_hours=seller_obj.available_hours,
-        role=user.role.value
+        role=user.role,  
+        zone=db_seller.zone,
+        available_days=db_seller.available_days,
+        available_hours=db_seller.available_hours
     )
+
 
 @router.get("", response_model=list[SellerResponse])
 def get_sellers(db: Session = Depends(get_db)):

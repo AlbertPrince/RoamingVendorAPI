@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
-from app.schemas.user_schema import UserBase, UserRole
+from app.schemas.user_schema import UserBase
+from app.models.user import UserRole
 
 
 class BuyerCreate(UserBase):
@@ -10,7 +11,7 @@ class BuyerCreate(UserBase):
 class BuyerResponse(UserBase):
     id: int
     preferences: Optional[str] = None
-    role: UserRole = UserRole.buyer
+    role: UserRole 
 
     class Config:
         from_attributes = True

@@ -15,7 +15,7 @@ class SellerResponse(UserBase):
     zone: str
     available_days: Optional[str] = None
     available_hours: Optional[str] = None
-    role: UserRole = UserRole.seller
+    role: UserRole 
 
     class Config:
         from_attributes = True

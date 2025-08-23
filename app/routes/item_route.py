@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app.schemas.item_schema import ItemCreate, ItemResponse
 from app.models.item import Item
@@ -22,42 +22,54 @@ def create_item(item: ItemCreate, db: Session = Depends(get_db)):
     db.refresh(new_item)
     return new_item
 
-@router.get("/items/search", response_model=list[ItemResponse])
+@router.get("/search", response_model=list[ItemResponse])
 def search_items(
     name: str = Query(None, description="Name of the item to search for"),
     max_price: float = Query(None, description="Maximum price of the item"),
     day: str = Query(None, description="Day of the week to check availability"),
-    time: str = Query(None, description="Time to check availability in HH:MM format"),  
+    time: str = Query(None, description="Time to check availability in HH:MM format"),
     db: Session = Depends(get_db)
 ):
-    query = db.query(Item).join(Seller)
+    query = (
+        db.query(Item)
+        .join(Seller)
+        .options(joinedload(Item.seller))
+    )
+
     if name:
         query = query.filter(Item.name.ilike(f"%{name}%"))
     if max_price is not None:
         query = query.filter(Item.price <= max_price)
     if day:
         query = query.filter(Seller.available_days.ilike(f"%{day}%"))
-    if time:
+
+    if not time:
+        return query.all()
+
+    try:
+        input_time = time_obj.fromisoformat(time)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid time format. Use HH:MM.")
+
+    query = query.filter(Seller.available_hours.isnot(None)).filter(Seller.available_hours != '')
+
+    results = []
+    for item in query.all():
+        hours_str = item.seller.available_hours
+        if not hours_str or "-" not in hours_str:
+            continue 
+
         try:
-            input_time = time_obj.fromisoformat(time)
-            query = query.filter(
-                Seller.available_hours != None,
-            ).filter(
-                Seller.available_hours.contains("-")
-            )
-
-            results = []
-            for item in query.all():
-                start_str, end_str = item.seller.available_hours.split("-")
-                start_time = time_obj.fromisoformat(start_str.strip())
-                end_time = time_obj.fromisoformat(end_str.strip())
-                
-                if start_time <= input_time <= end_time:
-                    results.append(item)
-
-            return results
+            start_str, end_str = hours_str.split("-")
+            start_time = time_obj.fromisoformat(start_str.strip())
+            end_time = time_obj.fromisoformat(end_str.strip())
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid time format. Use HH:MM.")
+            continue
+
+        if start_time <= input_time <= end_time:
+            results.append(item)
+
+    return results
             
 
 @router.get("/items/", response_model=list[ItemResponse])
