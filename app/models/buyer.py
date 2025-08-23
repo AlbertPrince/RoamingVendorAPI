@@ -11,3 +11,6 @@ class Buyer(Base):
 
     user = relationship("User", back_populates="buyer")
     item_requests = relationship("ItemRequest", back_populates="buyer")
+
+    def __repr__(self):
+        return f"<Buyer(name={self.user.name}, phone_number={self.user.phone_number})>"

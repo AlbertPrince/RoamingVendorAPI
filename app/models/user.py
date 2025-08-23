@@ -19,3 +19,4 @@ class User(Base):
 
     buyer = relationship("Buyer", back_populates="user", uselist=False)
     seller = relationship("Seller", back_populates="user", uselist=False)
+
