@@ -8,7 +8,7 @@ class ItemRequest(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     item_id = Column(Integer, ForeignKey("items.id"))
-    buyer_id = Column(Integer, nullable=False)
+    buyer_id = Column(Integer, ForeignKey("buyers.id"), nullable=False)
     contact_info = Column(String, nullable=False)
     message = Column(String, nullable=True)
 

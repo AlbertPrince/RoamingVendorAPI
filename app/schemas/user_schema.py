@@ -1,6 +1,12 @@
-from app.models.user import UserRole
+# from app.models.user import UserRole
 from typing import Optional
 from pydantic import BaseModel
+
+from enum import Enum
+
+class UserRole(str, Enum):
+    buyer = "buyer"
+    seller = "seller"
 
 
 class UserBase(BaseModel):
@@ -8,13 +14,13 @@ class UserBase(BaseModel):
     email: Optional[str] 
     phone_number: str
 
-class UserCreate(UserBase):
-    role: UserRole
+# class UserCreate(UserBase):
+#     role: UserRole
 
 
-class UserResponse(UserBase):
-    id: int
-    role: UserRole
+# class UserResponse(UserBase):
+#     id: int
+#     role: UserRole
 
-    class Config:
-        from_attributes = True
+#     class Config:
+#         from_attributes = True

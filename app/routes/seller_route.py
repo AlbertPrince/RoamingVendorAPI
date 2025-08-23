@@ -9,8 +9,7 @@ from app.database import SessionLocal
 router = APIRouter()
 
 @router.post("", response_model=SellerResponse)
-def create_seller(seller_data: SellerCreate, db: Session = Depends(get_db)):
-    # 1. Create user
+def create_seller(seller_data: SellerCreate, db: Session = Depends(get_db)):  
     user = User(
         name=seller_data.name,
         email=seller_data.email,
@@ -18,31 +17,19 @@ def create_seller(seller_data: SellerCreate, db: Session = Depends(get_db)):
         role=UserRole.seller
     )
     db.add(user)
-    db.commit()
-    db.refresh(user)
+    db.flush()  
 
-    # 2. Create seller profile
-    db_seller = Seller(
-        user_id=user.id,
+    seller = Seller(
+        id=user.id,
         zone=seller_data.zone,
         available_days=seller_data.available_days,
-        available_hours=seller_data.available_hours
+        available_hours=seller_data.available_hours,
+        user=user
     )
-    db.add(db_seller)
+    db.add(seller)
     db.commit()
-    db.refresh(db_seller)
-
-    # 3. Return response
-    return SellerResponse(
-        id=db_seller.id,
-        name=user.name,
-        email=user.email,
-        phone_number=user.phone_number,
-        role=user.role,  
-        zone=db_seller.zone,
-        available_days=db_seller.available_days,
-        available_hours=db_seller.available_hours
-    )
+    db.refresh(seller)
+    return seller
 
 
 @router.get("", response_model=list[SellerResponse])

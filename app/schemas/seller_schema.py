@@ -4,7 +4,9 @@ from app.schemas.user_schema import UserRole
 
 from app.schemas.user_schema import UserBase
 
-class SellerCreate(UserBase):    
+class SellerCreate(UserBase):
+    name: str
+    phone_number: str
     zone: str
     available_days: Optional[str] = None
     available_hours: Optional[str] = None
@@ -15,7 +17,7 @@ class SellerResponse(UserBase):
     zone: str
     available_days: Optional[str] = None
     available_hours: Optional[str] = None
-    role: UserRole 
+    role: UserRole = UserRole.seller
 
     class Config:
         from_attributes = True
