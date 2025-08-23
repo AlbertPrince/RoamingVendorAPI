@@ -5,7 +5,7 @@ class ItemCreate(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
-    category: str
+    # category: str
     seller_id: int
 
 class ItemResponse(ItemCreate):

@@ -15,8 +15,8 @@ def create_item(item: ItemCreate, db: Session = Depends(get_db)):
     seller = db.query(Seller).filter(Seller.id == item.seller_id).first()
     if not seller:
         raise HTTPException(status_code=404, detail="Seller not found")
-    
-    new_item = Item(**item.dict())
+
+    new_item = Item(**item.model_dump())
     db.add(new_item)
     db.commit()
     db.refresh(new_item)

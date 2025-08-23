@@ -14,6 +14,5 @@ class Seller(Base):
     user = relationship("User", back_populates="seller")
     items = relationship("Item", back_populates="seller")
 
-
     def __repr__(self):
         return f"<Seller(name={self.user.name}, phone_number={self.user.phone_number}, zone={self.zone})>"

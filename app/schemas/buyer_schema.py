@@ -5,14 +5,20 @@ from app.models.user import UserRole
 
 
 class BuyerCreate(UserBase):
-    phone_number: str
     role: UserRole = UserRole.buyer
     preferences: Optional[str] = None
+
 
 class BuyerResponse(UserBase):
     id: int
     preferences: Optional[str] = None
     role: UserRole = UserRole.buyer
 
-    class Config:
-        from_attributes = True
+    # class Config:
+    #     from_attributes = True
+
+    model_config = {
+        "from_attributes": True
+    }
+        
+        

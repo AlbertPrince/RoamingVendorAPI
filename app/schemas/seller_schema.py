@@ -19,5 +19,9 @@ class SellerResponse(UserBase):
     available_hours: Optional[str] = None
     role: UserRole = UserRole.seller
 
-    class Config:
-        from_attributes = True
+    # class Config:
+    #     from_attributes = True
+
+    model_config = {
+        "from_attributes": True
+    }

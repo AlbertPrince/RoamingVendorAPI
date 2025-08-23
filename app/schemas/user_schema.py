@@ -13,14 +13,3 @@ class UserBase(BaseModel):
     name: str
     email: Optional[str] 
     phone_number: str
-
-# class UserCreate(UserBase):
-#     role: UserRole
-
-
-# class UserResponse(UserBase):
-#     id: int
-#     role: UserRole
-
-#     class Config:
-#         from_attributes = True
