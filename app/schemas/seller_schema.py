@@ -1,15 +1,21 @@
 from pydantic import BaseModel
 from typing import Optional
+from app.schemas.user_schema import UserRole
 
-class SellerCreate(BaseModel):
-    name: str
-    phone_number: str
+from app.schemas.user_schema import UserBase
+
+class SellerCreate(UserBase):    
     zone: str
     available_days: Optional[str] = None
     available_hours: Optional[str] = None
+    role: UserRole = UserRole.seller
 
-class SellerResponse(SellerCreate):
+class SellerResponse(UserBase):
     id: int
+    zone: str
+    available_days: Optional[str] = None
+    available_hours: Optional[str] = None
+    role: UserRole = UserRole.seller
 
     class Config:
-        orm_mode = True
+        from_attributes = True

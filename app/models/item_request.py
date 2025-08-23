@@ -8,8 +8,9 @@ class ItemRequest(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     item_id = Column(Integer, ForeignKey("items.id"))
-    buyer_name = Column(String, nullable=False)
+    buyer_id = Column(Integer, nullable=False)
     contact_info = Column(String, nullable=False)
     message = Column(String, nullable=True)
 
     item = relationship("Item", back_populates="requests")
+    buyer = relationship("Buyer", back_populates="item_requests")

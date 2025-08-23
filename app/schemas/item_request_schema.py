@@ -6,7 +6,6 @@ class ItemRequestBase(BaseModel):
     contact_info: str
     message: str | None = None
 
-
 class ItemRequestCreate(ItemRequestBase):
     pass
 
@@ -14,4 +13,4 @@ class ItemRequestResponse(ItemRequestBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
