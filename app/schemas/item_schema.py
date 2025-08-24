@@ -5,13 +5,13 @@ class ItemCreate(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
-    category: str
+    # category: str
     seller_id: int
 
 class ItemResponse(ItemCreate):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
